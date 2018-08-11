@@ -31,8 +31,6 @@ class Sudoku {
     while(counterEmpty < coordinate.length){
         x = coordinate[counterCoor][0];
         y = coordinate[counterCoor][1];
-        console.log("ini X === ",x);
-        console.log("ini Y === ",y);
 
         let condition = false;
 
@@ -50,7 +48,11 @@ class Sudoku {
             condition = true;
             counterCoor++;
             number = 1;
-            console.log(papan);
+            this.printBoard(papan);
+            //console.log(papan);
+            this.sleep();
+            this.clearScreen();
+
             counterEmpty++;
             break;
           }
@@ -81,12 +83,28 @@ class Sudoku {
       console.log("======================");
       console.log("SOLUTION");
       console.log("======================");
+      console.log(this.printBoard(this.papan));
       return papan;
   }
 
   // Returns a string representing the current state of the board
   printBoard(prntBoard) {
-    return prntBoard;
+    for(let i = 0;i<prntBoard.length;i++){
+      let temp = "";
+      for(let j = 0;j<prntBoard.length;j++){
+        if(j===2||j===5){
+          temp+= `${prntBoard[i][j]} | `;
+        }
+        else{
+          temp+= `${prntBoard[i][j]}  `;
+        }
+
+      }
+      if(i===3||i===6){
+        console.log("----------------------------");
+      }
+      console.log(temp);
+    }
   }
 
   //*Creating Initial Board
@@ -161,6 +179,20 @@ class Sudoku {
   checkSafe(){
     return this.checkRow()&&this.checkCol()&&this.checkBox();
   }
+  sleep (milliseconds) {
+    var start = new Date().getTime();
+    for (var i = 0; i < 1e7; i++) {
+      if ((new Date().getTime() - start) > milliseconds) {
+        break;
+      }
+    }
+  }
+
+  clearScreen () {
+    // Un-comment this line if you have trouble with console.clear();
+    // return process.stdout.write('\033c');
+    console.clear();
+  }
 }
 
 // The file has newlines at the end of each line,
@@ -174,10 +206,10 @@ var game = new Sudoku(board_string);
 //console.log(game.papan);
 
 
-console.log(game.solution);
+//console.log(game.solution);
 
 
 
 // Remember: this will just fill out what it can and not "guess"
-//game.solve()
+console.log(game.solve());
 //console.log(game.board())
