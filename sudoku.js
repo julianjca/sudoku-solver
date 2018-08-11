@@ -3,54 +3,100 @@
 class Sudoku {
   constructor(board_string) {
     this.papan = this.createInitialBoard(board_string);
+    this.initialBoard = this.createInitialBoard(board_string);
     this.solution = this.solve(this.papan);
   }
 
-  solve(papan, row, col) {
+  //*Solving Sudoku
+  solve(papan) {
     console.log("======================");
     console.log("INITIAL BOARD");
     console.log("======================");
     console.log(papan);
     console.log("");
 
-    let solved = false;
+    let x;
+    let y;
+    let checkColCon = false;
+    let checkRowCon= false;
+    let checkBoxwCon = false;
+    let coordinate = this.findEmpty();
+    let counterCoor = 0;
+    let counterEmpty = 0;
+    //console.log("Empty Coordinate");
+    //console.log(coordinate);
+    let number = 1;
 
-    while(solved === false){
-      console.log("Empty Coordinate");
 
-      let coordinate = this.findEmpty();
-      console.log(coordinate);
-      let x = coordinate[0];
-      let y = coordinate[1];
+    while(counterEmpty < coordinate.length){
+        x = coordinate[counterCoor][0];
+        y = coordinate[counterCoor][1];
+        console.log("ini X === ",x);
+        console.log("ini Y === ",y);
 
-      for(let number = 1;number<=9;number++){
         let condition = false;
-        while(this.checkSafe===false){
-          this.checkRow(number, x, y);
-          console.log(this.checkRow(number));
-          this.checkCol(number, x, y);
-          console.log(this.checkCol(number));
-          this.checkBox(number, x, y);
-          condition = this.checkSafe();
+
+        while(condition===false){
+          checkColCon = false;
+          checkRowCon= false;
+          checkBoxwCon = false;
+
+          checkColCon = this.checkCol(number, y, this.papan);
+          checkRowCon = this.checkRow(number, x, this.papan);
+          checkBoxwCon = this.checkBox(number, x, y);
+
+          if(checkRowCon&&checkColCon&&checkBoxwCon === true){
+            this.papan[x][y] = number;
+            condition = true;
+            counterCoor++;
+            number = 1;
+            console.log(papan);
+            counterEmpty++;
+            break;
+          }
+
+          else if((number === 9 && condition===false) || (number===9 && (checkRowCon && checkColCon && checkBoxwCon === false))){
+            this.papan[x][y] = 0;
+            counterCoor--;
+            counterEmpty--;
+            x = coordinate[counterCoor][0];
+            y = coordinate[counterCoor][1];
+            number = this.papan[x][y];
+            condition = false;
+            break;
+          }
+
+          else{
+            number++;
+          }
         }
-
-
       }
-    }
+
+      console.log("");
+      console.log("======================");
+      console.log("INITIAL BOARD");
+      console.log("======================");
+      console.log(this.printBoard(this.initialBoard));
+      console.log("");
+      console.log("======================");
+      console.log("SOLUTION");
+      console.log("======================");
+      return papan;
   }
 
   // Returns a string representing the current state of the board
-  printBoard() {
-
+  printBoard(prntBoard) {
+    return prntBoard;
   }
 
+  //*Creating Initial Board
   createInitialBoard(papan1){
     let result = [];
     let counter = 0;
     while(counter<81){
       let tmp = [];
       for(let j = 0;j<9;j++){
-        tmp.push(papan1[counter]);
+        tmp.push(parseInt(papan1[counter]));
         counter++;
       }
       result.push(tmp);
@@ -58,49 +104,63 @@ class Sudoku {
     return result;
   }
 
+  //*Creating array that has not been filled yet
   findEmpty(){
-    let coordinate = [-1,-1];
-    let condition = true;
+    const result = [];
+    let temp = [];
     for(let i = 0;i<9;i++){
       for(let j = 0;j<9;j++){
-        if(this.papan[i][j]==="0"){
-          coordinate[0] = i;
-          coordinate[1] = j;
-          condition = false;
-          break;
+        if(this.papan[i][j]===0){
+          temp.push(i);
+          temp.push(j);
+          result.push(temp);
+          temp = [];
         }
       }
-      if(condition===false){
-        break;
-      }
     }
-    return coordinate;
+    return result;
   }
 
-  checkCol(num, coorX, coorY){
+  //*Checking column
+  checkCol(num, coorY, papan){
     for(let i = 0;i<9;i++){
-      if(this.papan[i]===num){
+      if(papan[i][coorY] === num){
         return false;
-      } else{
-        return true;
       }
     }
+    return true;
   }
 
-  checkRow(num, coorX, coorY){
+  //*Checking Row
+  checkRow(num, coorX, papan){
+    for(let i = 0;i<9;i++){
+      if(papan[coorX][i] === num){
+        return false;
+      }
+
+    }
+    return true;
 
   }
 
+  //*Checking box
   checkBox(num, coorX, coorY){
+    let tempCoorX = Math.floor(coorX/3)*3;
+    let tempCoorY = Math.floor(coorY/3)*3;
 
+    for(let i = tempCoorX;i<tempCoorX+3;i++){
+      for(let j = tempCoorY;j<tempCoorY+3;j++){
+        if(num===this.papan[i][j]){
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   checkSafe(){
-    return this.checkRow&&this.checkCol&&this.checkBox;
+    return this.checkRow()&&this.checkCol()&&this.checkBox();
   }
-
-
-
 }
 
 // The file has newlines at the end of each line,
@@ -112,6 +172,8 @@ var board_string = fs.readFileSync('set-01_sample.unsolved.txt')
 
 var game = new Sudoku(board_string);
 //console.log(game.papan);
+
+
 console.log(game.solution);
 
 
